@@ -27,9 +27,12 @@ read -p "Enter your Jira Domain (e.g., your-domain.atlassian.net): " JIRA_DOMAIN
 read -p "Enter your Jira User Email: " JIRA_USER
 read -p "Enter your Notion API Key: " NOTION_API_KEY
 read -p "Enter your Gemini API Key: " GEMINI_API_KEY
+read -p "Enter model: " MODEL
+
 
 cat <<EOF > "$ENV_FILE"
 GOOGLE_CLOUD_PROJECT=$PROJECT_ID
+MODEL=$MODEL
 GEMINI_API_KEY=$GEMINI_API_KEY
 GOOGLE_CLOUD_LOCATION=global
 JIRA_API_TOKEN=$JIRA_API_TOKEN
