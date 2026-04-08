@@ -1,10 +1,10 @@
 import uuid
 from google.adk.agents import Agent
-from agents.workers.jira import jira_analyst
-from agents.workers.notion import notion_architect
+from nexus_agent_coordinator.agents.workers.jira import jira_analyst
+from nexus_agent_coordinator.agents.workers.notion import notion_architect
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-from config import DEFAULT_MODEL
+from nexus_agent_coordinator.config import DEFAULT_MODEL
 
 # Primary Coordinator acts as the central router, utilizing sub-agents directly as callable tools
 root_agent = Agent(
@@ -26,7 +26,7 @@ session_service = InMemorySessionService()
 
 # Setup Agent Runner
 coordinator_runner = Runner(
-    root_agent=root_agent,
+    agent=root_agent,
     app_name=APP_NAME,
     session_service=session_service,
 )

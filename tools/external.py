@@ -1,6 +1,6 @@
 import os
 import base64
-from config import JIRA_API_TOKEN, NOTION_API_KEY, JIRA_USER
+from nexus_agent_coordinator.config import JIRA_API_TOKEN, NOTION_API_KEY, JIRA_USER
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams 
 

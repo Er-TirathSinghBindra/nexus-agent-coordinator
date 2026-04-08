@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
-from tools.external import get_jira_mcp_tool
-from config import DEFAULT_MODEL
+from nexus_agent_coordinator.tools.external import get_jira_mcp_tool
+from nexus_agent_coordinator.config import DEFAULT_MODEL
 
 jira_analyst = Agent(
     name="jira_analyst",
