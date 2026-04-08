@@ -2,7 +2,6 @@ import os
 import base64
 from config import JIRA_API_TOKEN, NOTION_API_KEY, JIRA_USER
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
-from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams, StdioServerParameters
 from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams 
 
 def get_jira_mcp_tool():
@@ -31,12 +30,9 @@ def get_notion_mcp_tool():
     env["NOTION_API_KEY"] = NOTION_API_KEY
     
     return MCPToolset(
-        connection_params=StdioConnectionParams(
-            server_params=StdioServerParameters(
-                command="npx",
-                args=["-y", "@modelcontextprotocol/server-notion"],
-                env=env
-            ),
-            timeout=30.0
+        connection_params=StreamableHTTPConnectionParams(
+            url="https://mcp.notion.com/mcp",
+            timeout=30.0,          
+            sse_read_timeout=300.0
         )
     )
