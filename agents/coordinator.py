@@ -1,6 +1,7 @@
 from google.adk.agents import Agent
 from agents.workers.jira import jira_analyst
 from agents.workers.notion import notion_architect
+from google.adk.runners import Runner
 
 # Primary Coordinator acts as the central router, utilizing sub-agents directly as callable tools
 coordinator_agent = Agent(
@@ -13,4 +14,9 @@ coordinator_agent = Agent(
         jira_analyst,
         notion_architect
     ]
+)
+
+coordinator_runner = Runner(
+    agent=coordinator_agent,
+    app_name="nexus-agent-coordinator",
 )

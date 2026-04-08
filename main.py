@@ -2,7 +2,8 @@ import logging
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from core.schemas import JiraWebhookPayload, TaskRequest
 from core.firestore import check_if_processed, mark_ticket_processed
-from agents.coordinator import coordinator_agent
+
+from agents.coordinator import coordinator_runner
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,8 +21,14 @@ def process_jira_runner(payload: JiraWebhookPayload):
         logger.info(f"Background ADK Runner Session started for {payload.issue_key}")
         
         session_prompt = f"Process Jira Ticket: {payload.issue_key}. Event: {payload.webhookEvent}"
-        response = coordinator_agent.runner.run(session_prompt)
-        
+        new_message = types.Content(role='user', parts=[types.Part(text=session_prompt)])
+
+        events = coordinator_runner.run(new_message=new_message)
+        for event in events:
+            print(f"\nDEBUG EVENT: {event}\n")
+            if event.is_final_response() and event.content:
+                final_answer = event.content.parts[0].text.strip()
+                print("\n🟢 FINAL ANSWER\n", final_answer, "\n")
         logger.info(f"ADK runner session finished for {payload.issue_key}.")
         mark_ticket_processed(payload.issue_key, "completed")
         
@@ -43,7 +50,14 @@ async def jira_webhook(payload: JiraWebhookPayload, background_tasks: Background
 async def agent_task(payload: TaskRequest):
     """Synchronous Task Endpoint."""
     try:
-        response = coordinator_agent.runner.run(payload.prompt)
-        return {"result": response}
+        new_message = types.Content(role='user', parts=[types.Part(text=payload.prompt)])
+
+        events = coordinator_runner.run(new_message=new_message)
+        for event in events:
+            print(f"\nDEBUG EVENT: {event}\n")
+            if event.is_final_response() and event.content:
+                final_answer = event.content.parts[0].text.strip()
+                print("\n🟢 FINAL ANSWER\n", final_answer, "\n")
+        return {"result": final_answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
