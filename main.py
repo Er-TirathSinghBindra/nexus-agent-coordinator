@@ -20,7 +20,7 @@ def process_jira_runner(payload: JiraWebhookPayload):
         logger.info(f"Background ADK Runner Session started for {payload.issue_key}")
         
         session_prompt = f"Process Jira Ticket: {payload.issue_key}. Event: {payload.webhookEvent}"
-        response = coordinator_agent.invoke(session_prompt)
+        response = coordinator_agent.runner.run(session_prompt)
         
         logger.info(f"ADK runner session finished for {payload.issue_key}.")
         mark_ticket_processed(payload.issue_key, "completed")
@@ -43,7 +43,7 @@ async def jira_webhook(payload: JiraWebhookPayload, background_tasks: Background
 async def agent_task(payload: TaskRequest):
     """Synchronous Task Endpoint."""
     try:
-        response = coordinator_agent.invoke(payload.prompt)
+        response = coordinator_agent.runner.run(payload.prompt)
         return {"result": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
