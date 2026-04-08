@@ -10,3 +10,5 @@ LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
 # MCP Configurations
 JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN", "mock_jira_token")
 NOTION_API_KEY = os.getenv("NOTION_API_KEY", "mock_notion_key")
+
+DEFAULT_MODEL = os.getenv("MODEL", "gemini-2.5-flash")
