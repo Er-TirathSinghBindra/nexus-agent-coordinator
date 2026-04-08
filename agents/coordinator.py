@@ -20,11 +20,8 @@ coordinator_agent = Agent(
 
 # Setup Session Service
 APP_NAME = "nexus-agent-coordinator"
-USER_ID = str(uuid.uuid4())
-SESSION_ID = str(uuid.uuid4())
-
 session_service = InMemorySessionService()
-session = session_service.create_session(app_name=APP_NAME, user_id=USER_ID, session_id=SESSION_ID)
+
 # Setup Agent Runner
 coordinator_runner = Runner(
     agent=coordinator_agent,

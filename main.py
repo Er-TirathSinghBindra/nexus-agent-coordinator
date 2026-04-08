@@ -1,10 +1,11 @@
+import uuid
 import logging
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from core.schemas import JiraWebhookPayload, TaskRequest
 from core.firestore import check_if_processed, mark_ticket_processed
 
 from google.genai import types
-from agents.coordinator import coordinator_runner, USER_ID, SESSION_ID
+from agents.coordinator import coordinator_runner, session_service, APP_NAME
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,22 +15,29 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------
 app = FastAPI(title="Google-ADK Task Management API")
 
-def process_jira_runner(payload: JiraWebhookPayload):
+async def process_jira_runner(payload: JiraWebhookPayload):
     """
-    Background worker executing the ADK Runner session.
+    Background worker executing the ADK Runner session asynchronously.
     """
     try:
         logger.info(f"Background ADK Runner Session started for {payload.issue_key}")
         
+        # 1. Create a unique session per webhook execution
+        user_id = "system_webhook"
+        session_id = f"{payload.issue_key}_{uuid.uuid4().hex[:8]}"
+        await session_service.create_session(app_name=APP_NAME, user_id=user_id, session_id=session_id)
+        
+        # 2. Build model prompt
         session_prompt = f"Process Jira Ticket: {payload.issue_key}. Event: {payload.webhookEvent}"
         new_message = types.Content(role='user', parts=[types.Part(text=session_prompt)])
 
-        events = coordinator_runner.run(user_id=USER_ID, session_id=SESSION_ID, new_message=new_message)
-        for event in events:
-            print(f"\nDEBUG EVENT: {event}\n")
+        # 3. Stream Async Events
+        final_answer = ""
+        async for event in coordinator_runner.run_async(user_id=user_id, session_id=session_id, new_message=new_message):
             if event.is_final_response() and event.content:
                 final_answer = event.content.parts[0].text.strip()
-                print("\n🟢 FINAL ANSWER\n", final_answer, "\n")
+                logger.info(f"\n🟢 FINAL ANSWER\n{final_answer}\n")
+                
         logger.info(f"ADK runner session finished for {payload.issue_key}.")
         mark_ticket_processed(payload.issue_key, "completed")
         
@@ -45,20 +53,23 @@ async def jira_webhook(payload: JiraWebhookPayload, background_tasks: Background
         return {"message": "Ticket already processed", "status": "skipped"}
     
     background_tasks.add_task(process_jira_runner, payload)
-    return {"message": "Ticket accepted and ADK runner started", "status": "processing"}
+    return {"message": "Ticket accepted and ADK async runner started", "status": "processing"}
 
 @app.post("/api/agent/task")
 async def agent_task(payload: TaskRequest):
     """Synchronous Task Endpoint."""
     try:
+        user_id = "api_user"
+        session_id = f"task_{uuid.uuid4().hex[:8]}"
+        await session_service.create_session(app_name=APP_NAME, user_id=user_id, session_id=session_id)
+        
         new_message = types.Content(role='user', parts=[types.Part(text=payload.prompt)])
 
-        events = coordinator_runner.run(user_id=USER_ID, session_id=SESSION_ID,new_message=new_message)
-        for event in events:
-            print(f"\nDEBUG EVENT: {event}\n")
+        final_answer = ""
+        async for event in coordinator_runner.run_async(user_id=user_id, session_id=session_id, new_message=new_message):
             if event.is_final_response() and event.content:
                 final_answer = event.content.parts[0].text.strip()
-                print("\n🟢 FINAL ANSWER\n", final_answer, "\n")
+                
         return {"result": final_answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
