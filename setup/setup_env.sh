@@ -19,16 +19,18 @@ gcloud services enable firestore.googleapis.com --project=$PROJECT_ID
 
 # Setup .env file correctly directed to the project root
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ENV_FILE="$SCRIPT_DIR/../.env"
+ENV_FILE="$SCRIPT_DIR/.env"
 
 echo "Please provide your MCP Tool configurations below:"
 read -p "Enter your Jira API Token: " JIRA_API_TOKEN
 read -p "Enter your Jira Domain (e.g., your-domain.atlassian.net): " JIRA_DOMAIN
 read -p "Enter your Jira User Email: " JIRA_USER
 read -p "Enter your Notion API Key: " NOTION_API_KEY
+read -p "Enter your Gemini API Key: " GEMINI_API_KEY
 
 cat <<EOF > "$ENV_FILE"
 GOOGLE_CLOUD_PROJECT=$PROJECT_ID
+GEMINI_API_KEY=$GEMINI_API_KEY
 GOOGLE_CLOUD_LOCATION=global
 JIRA_API_TOKEN=$JIRA_API_TOKEN
 JIRA_DOMAIN=$JIRA_DOMAIN
