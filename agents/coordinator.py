@@ -21,7 +21,7 @@ coordinator_agent = Agent(
 )
 
 # Setup Session Service
-APP_NAME = "nexus-agent-coordinator"
+APP_NAME = "nexus_agent_coordinator"
 session_service = InMemorySessionService()
 
 # Setup Agent Runner
