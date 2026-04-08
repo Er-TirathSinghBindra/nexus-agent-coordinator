@@ -18,7 +18,7 @@ This architecture handles complex issue processing idempotently and asynchronous
 
 ## Architecture
 
-![Architecture Diagram](design/architecture_diagram.png)
+![Architecture Diagram](assets/architecture_diagram.png)
 
 1. A Jira webhook is triggered on issue creation.
 2. The FastAPI `POST /api/webhooks/jira` endpoint processes the request.
@@ -33,7 +33,7 @@ This architecture handles complex issue processing idempotently and asynchronous
 Ensure your local Python environment is activated, then boot the server:
 
 ```bash
-conda activate genAIAPAC-py312
+conda activate nexus-agent
 uvicorn main:app --reload
 ```
 
