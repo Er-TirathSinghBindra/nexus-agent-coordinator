@@ -3,6 +3,7 @@ from fastapi import FastAPI, BackgroundTasks, HTTPException
 from core.schemas import JiraWebhookPayload, TaskRequest
 from core.firestore import check_if_processed, mark_ticket_processed
 
+from google.genai import types
 from agents.coordinator import coordinator_runner, USER_ID, SESSION_ID
 
 logging.basicConfig(level=logging.INFO)
