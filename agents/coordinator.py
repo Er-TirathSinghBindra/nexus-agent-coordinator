@@ -7,7 +7,7 @@ from google.adk.sessions import InMemorySessionService
 from config import DEFAULT_MODEL
 
 # Primary Coordinator acts as the central router, utilizing sub-agents directly as callable tools
-coordinator_agent = Agent(
+root_agent = Agent(
     name="primary_coordinator",
     model=DEFAULT_MODEL,
     instruction="""You are the Primary Task Coordinator. 
@@ -26,7 +26,7 @@ session_service = InMemorySessionService()
 
 # Setup Agent Runner
 coordinator_runner = Runner(
-    agent=coordinator_agent,
+    root_agent=root_agent,
     app_name=APP_NAME,
     session_service=session_service,
 )
