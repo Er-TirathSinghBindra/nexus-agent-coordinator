@@ -6,10 +6,10 @@ from agents.workers.notion import notion_architect
 coordinator_agent = Agent(
     name="primary_coordinator",
     instruction="""You are the Primary Task Coordinator. 
-    When an issue is received, use the jira_analyst tool to fetch context. 
-    Then, pass the analyzed context into the notion_architect tool to generate a Notion page.
+    When an issue is received, use the jira_analyst sub-agent to fetch context. 
+    Then, pass the analyzed context into the notion_architect sub-agent to generate a Notion page.
     Synthesize their responses and return the result.""",
-    tools=[
+    sub_agents=[
         jira_analyst,
         notion_architect
     ]
