@@ -33,7 +33,9 @@ This architecture handles complex issue processing idempotently and asynchronous
 Ensure your local Python environment is activated, then boot the server:
 
 ```bash
+conda create -n nexus-agent python=3.12
 conda activate nexus-agent
+python -m pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
