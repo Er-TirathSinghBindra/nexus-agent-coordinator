@@ -3,7 +3,7 @@ from fastapi import FastAPI, BackgroundTasks, HTTPException
 from core.schemas import JiraWebhookPayload, TaskRequest
 from core.firestore import check_if_processed, mark_ticket_processed
 
-from agents.coordinator import coordinator_runner
+from agents.coordinator import coordinator_runner, USER_ID, SESSION_ID
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def process_jira_runner(payload: JiraWebhookPayload):
         session_prompt = f"Process Jira Ticket: {payload.issue_key}. Event: {payload.webhookEvent}"
         new_message = types.Content(role='user', parts=[types.Part(text=session_prompt)])
 
-        events = coordinator_runner.run(new_message=new_message)
+        events = coordinator_runner.run(user_id=USER_ID, session_id=SESSION_ID, new_message=new_message)
         for event in events:
             print(f"\nDEBUG EVENT: {event}\n")
             if event.is_final_response() and event.content:
@@ -52,7 +52,7 @@ async def agent_task(payload: TaskRequest):
     try:
         new_message = types.Content(role='user', parts=[types.Part(text=payload.prompt)])
 
-        events = coordinator_runner.run(new_message=new_message)
+        events = coordinator_runner.run(user_id=USER_ID, session_id=SESSION_ID,new_message=new_message)
         for event in events:
             print(f"\nDEBUG EVENT: {event}\n")
             if event.is_final_response() and event.content:
